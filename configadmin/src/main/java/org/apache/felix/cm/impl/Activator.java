@@ -26,6 +26,7 @@ import java.util.Hashtable;
 import org.apache.felix.cm.PersistenceManager;
 import org.apache.felix.cm.file.FilePersistenceManager;
 import org.apache.felix.cm.impl.persistence.PersistenceManagerTracker;
+import org.apache.felix.cm.plugins.EnvConfigutationPlugin;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
@@ -33,6 +34,7 @@ import org.osgi.framework.BundleException;
 import org.osgi.framework.Constants;
 import org.osgi.framework.InvalidSyntaxException;
 import org.osgi.framework.ServiceRegistration;
+import org.osgi.service.cm.ConfigurationPlugin;
 import org.osgi.service.log.LogService;
 
 /**
@@ -105,6 +107,19 @@ public class Activator implements BundleActivator
             Log.logger.log( LogService.LOG_ERROR, "Cannot create the persistence manager tracker", iae );
             throw new BundleException(iae.getMessage(), iae);
         }
+        
+        String activateEnv= EnvConfigutationPlugin.SWITCH;
+        if(EnvConfigutationPlugin.SWITCH_ACTIVE.equals(activateEnv)) {
+            String ranking= EnvConfigutationPlugin.RANKING;
+           Hashtable<String ,Object> dict=new Hashtable<>();
+           
+           if(ranking!=null&&!ranking.isEmpty()) {
+           	dict.put(Constants.SERVICE_RANKING, EnvConfigutationPlugin.RANKING);
+           }
+           
+   		bundleContext.registerService(ConfigurationPlugin.class.getName(), new EnvConfigutationPlugin(), dict);
+   		
+       }
     }
 
 
